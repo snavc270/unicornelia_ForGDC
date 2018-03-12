@@ -1,5 +1,4 @@
 class Window{
-  
   float xPos, yPos; 
   int windowSize = int(height*.6); 
   int windowNum; 
@@ -18,10 +17,11 @@ class Window{
   }
   
   void display(){
+    image(windows[windowNum], xPos, yPos); 
     textSize(s); 
+    textAlign(CENTER); 
     text(textArray[n][windowNum*2], xPos-250, yPos, 500, yPos); 
     windows[windowNum].resize(0, windowSize); 
-    textAlign(CENTER); 
   }
   
   void blur(){
@@ -39,9 +39,5 @@ class Window{
     if(windowSize>= 20){
       windowSize -= 20;
     }   
-  }
-  
-  void popWindow(){
-    
   }
 }

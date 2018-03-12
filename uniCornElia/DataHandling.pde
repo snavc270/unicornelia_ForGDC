@@ -49,14 +49,14 @@ void importTextData(){
   }
   
   for(int i = 0; i<5; i++){
-    textArray[i][0] = wPositive[i]; 
-    textArray[i][1] = wNegative[i]; 
-    textArray[i][2] = fPositive[i]; 
-    textArray[i][3] = fNegative[i]; 
-    textArray[i][4] = lPositive[i]; 
-    textArray[i][5] = lNegative[i]; 
-    textArray[i][6] = gPositive[i]; 
-    textArray[i][7] = gNegative[i]; 
+    textArray[i][0] = lPositive[i]; 
+    textArray[i][1] = lNegative[i]; 
+    textArray[i][2] = wPositive[i]; 
+    textArray[i][3] = wNegative[i]; 
+    textArray[i][4] = gPositive[i]; 
+    textArray[i][5] = gNegative[i]; 
+    textArray[i][6] = fPositive[i]; 
+    textArray[i][7] = fNegative[i]; 
   }
   
   
