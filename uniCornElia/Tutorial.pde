@@ -9,10 +9,10 @@ void displayTutorialText(int xPos, int yPos, int n){
   }
   noStroke(); 
   fill(0); 
-  rect(xPos, yPos, width*.5, 150); 
+  rect(xPos, yPos-25, width*.6, 150); 
   fill(255); 
   textSize(52); 
-  textAlign(LEFT);
+  textAlign(CENTER);
   text(tText[n], xPos, yPos, width*.6, 200); 
 }
 int stateTime; 

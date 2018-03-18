@@ -2,6 +2,7 @@ import processing.serial.*;
 import processing.video.*;
 
 int windowButtons[] = new int[4]; 
+int lastWindowButtons[] = new int[4]; 
 int feelButtons[] = new int[4]; 
  
 Serial port; 
@@ -18,15 +19,18 @@ import ddf.minim.ugens.*;
 Minim minim; 
 AudioPlayer introSong; 
 int interval[] = new int[4]; 
-int state = 9; 
+int state = 4; 
 int pulse;
 PImage bgImage, feelingsDiagram;
+PImage horn, pannel, hand; 
 
 ArrayList <Window> windows[] = new ArrayList[4]; 
 //ArrayList <Window> windows = new ArrayList<Window>(); 
 
 int startTime; 
 int timer; 
+boolean button1Pressed = false;
+boolean button2Pressed = false; 
 
 int tNum = 5; 
 Window [] tutorialWindows = new Window[6]; 
@@ -44,7 +48,7 @@ void setup(){
   
   minim = new Minim(this);
   introSong = minim.loadFile("data/introMusic.mp3");
-  //introSong.loop(); 
+  introSong.loop(); 
   
   font = createFont("8-BitMadness.ttf", 60); 
   textFont(font); 
@@ -53,7 +57,16 @@ void setup(){
   port.bufferUntil('\n');
 
   bgImage = loadImage("bgImage.png"); 
-  feelingsDiagram = loadImage("tent-05.png"); 
+  feelingsDiagram = loadImage("tent-05.png");
+  horn = loadImage("horn.png"); 
+  horn.resize(0, int(height*.3));
+  
+  pannel = loadImage("colorPannel.png"); 
+  pannel.resize(0, int(height*.25));
+  
+  hand = loadImage("hand.png"); 
+  hand.resize(0, int(height*.15));
+  
   feelingsDiagram.resize(0, int(height*.45));
   
   startTime = millis(); 
@@ -71,7 +84,8 @@ void movieEvent(Movie m) {
   m.read();
 }
 void draw(){
-
+  float increment; 
+  increment = sin(frameCount/3)*30;
   if(state == 0){
      intro(); 
      for(int i = 0; i<4; i++){
@@ -83,22 +97,23 @@ void draw(){
   }
   else if (state == 1){
      background(0); 
-     timeChange(2, int(width*.33), int(height*.4), 0); 
+     timeChange(2, int(width*.2), int(height*.4), 0); 
   }
   else if (state == 2){
-     timeChange(3, int(width*.05), int(height*.1), 1); 
+     timeChange(3, int(width*.2), int(height*.4), 1); 
   }
   else if (state == 3){
-    timeChange(3, int(width*.05), int(height*.1), 2); 
+    timeChange(3, int(width*.2), int(height*.4), 2); 
   }
   
   else if (state == 4){
- ////////////////////////////////////////////////////////////////ADD IN TUTORIAL GRAPHICS//////////////////////////////////////////////   
     displayTutorialText(int(width*.05),int(height*.1), 3);
     tutorialWindows[0].display();
-    
+    image(pannel, width*.3, height*.45);  
+    image(horn, width*.32 + increment, height*.56 - increment); 
+   
      ////////////////////////////////////////////////////////////////UNCOMMENT FOR TESTING//////////////////////////////////////////////   
-    //if(windowButtons[3] == 0){
+    //if(windowButtons[3] ==0){
     //  state = 5; 
     //}
     if(keyPressed){
@@ -111,33 +126,45 @@ void draw(){
       state = 6; 
     }
      ////////////////////////////////////////////////////////////////UNCOMMENT FOR TESTING//////////////////////////////////////////////   
-    //if(windowButtons[1] != 1){
+    //if(windowButtons[1] ==0){
+    //  button1Pressed = true; 
+    //}
+    //if(!button1Pressed){
     //  tutorialWindows[1].display();
     //}
-    //if(windowButtons[2] != 1){
+    //if(windowButtons[2] == 0){
+    //  button2Pressed = true; 
+    //}
+    //if(!button2Pressed){
     //  tutorialWindows[2].display();
+    //}
+    
+    //if(button1Pressed && button2Pressed){
+    //  state = 6; 
     //}
   }
   else if (state == 6){
-    timeChange(3, int(width*.05), int(height*.1), 5); 
+    button1Pressed = false; 
+    button2Pressed = false; 
+    timeChange(10, int(width*.05), int(height*.1), 5); 
   }
   else if (state == 7){
-  ////////////////////////////////////////////////////////////////add animation//////////////////////////////////////////////   
-     
     timeChange(3, int(width*.05), int(height*.1), 6); 
     image(feelingsDiagram, width/2, height/2);
   }
+  //minimize task 
   else if (state == 8){
     displayTutorialText(int(width*.05),int(height*.1), 7);
-    image(feelingsDiagram, width*.2, height*.75);
+    image(feelingsDiagram, width*.25, height*.65);
+    image(hand, width*.32, height*.85 - increment); 
     tutorialWindows[3].display();
 ////////////////////////////////////////////////////////////////UNCOMMENT FOR TESTING//////////////////////////////////////////////     
-    //if(feelButtons[3] == 0){
-    //  tutorialWindows[3].shrink();
-    //}
-    if(keyPressed){
+    if(feelButtons[3] == 1){
       tutorialWindows[3].shrink();
     }
+    //if(keyPressed){
+    //  tutorialWindows[3].shrink();
+    //}
     if(tutorialWindows[3].windowSize < 100){
       state = 9; 
     }
@@ -150,14 +177,14 @@ void draw(){
   //gamePlay 
   else if(state == 10){
      timer = ((millis() - startTime)/1000)/60; 
-     println(timer); 
+  
      image(bgImage, width*.5, height*.5, width, height); 
 
      windowFunctions(random(width*.15, width*.25),random(height*.15, height*.25), 0); 
      windowFunctions(random(width*.65, width*.75), random(height*.15, height*.25), 1); 
      windowFunctions(random(width*.15, width*.25), random(height*.65, height*.75), 2);
      windowFunctions(random(width*.65, width*.75), random(height*.65, height*.75), 3); 
-     if(timer>=3){
+     if(timer>=2){
        state = 11; 
      }
   }else if(state == 11){
@@ -190,7 +217,7 @@ void restart(){
 }
 
 void windowFunctions(float xPos, float yPos, int section){
-    if(state>=6){
+    if(state==10){
       if(frameCount % interval[section] == 0){
         windows[section].add(new Window(xPos, yPos, section)); 
       }
@@ -198,21 +225,22 @@ void windowFunctions(float xPos, float yPos, int section){
     
     for (int i = 0; i < windows[section].size(); i++) {
       Window w = windows[section].get(i);
-      if(i < windows[section].size()-1){
-        w.blur(); 
-      }else{
-        w.unBlur();
-      }
+
       if(w.windowSize<100){
         windows[section].remove(i); 
       }
       if(windows[section].size()>0){
-        if(feelButtons[section] == 0){
-          Window lastW = windows[section].get(windows[section].size()-1); 
-          lastW.shrink();
+        Window lastW = windows[section].get(windows[section].size()-1); 
+        if(feelButtons[section] == 0 || keyPressed){
+          if(key == 'b'){
+            lastW.shrink();
+          }
         }
-        if(windowButtons[section] == 0){
-          windows[section].remove(windows[section].size()-1); 
+        if(windowButtons[section] == 0 || keyPressed){
+          if(key == 'a'){
+            lastW.pop(); 
+          }
+          //windows[section].remove(windows[section].size()-1); 
         }
       }
       w.display();
@@ -239,7 +267,9 @@ void serialEvent(Serial port) {
         //println(allButtons[i]); 
         windowButtons[i] = allButtons[i+4]; 
         feelButtons[i] = allButtons[i]; 
+        lastWindowButtons[i] = windowButtons[i]; 
       }
     }
+   
   }
 }

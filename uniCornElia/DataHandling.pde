@@ -14,7 +14,7 @@ String [] gPositive, gNegative;
 String[][] textArray = new String[5][8];; 
 
 void importTextData(){
-  table = loadTable("text.csv", "header"); 
+  table = loadTable("narrativeText.csv", "header"); 
   
   numRows = table.getRowCount(); 
   numCols = table.getColumnCount();
