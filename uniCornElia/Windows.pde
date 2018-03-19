@@ -23,6 +23,7 @@ class Window{
   void display(){
     image(windows[windowNum], xPos, yPos); 
     textSize(s); 
+    fill(255); 
     textAlign(CENTER); 
     text(textArray[windowNum*2+g[windowNum]][n[windowNum*2+g[windowNum]]], xPos-250, yPos, 500, yPos); 
     windows[windowNum].resize(0, windowSize); 

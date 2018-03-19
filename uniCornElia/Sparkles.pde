@@ -1,82 +1,62 @@
-ParticleSystem ps;
-
-//void setup() {
-//  size(640, 360);
-//  ps = new ParticleSystem(new PVector(width/2, 50));
-//}
-
-//void draw() {
-//  background(0);
-//  ps.addParticle();
-//  ps.run();
-//}
-
+// Daniel Shiffman
+// http://codingtra.in
+// http://patreon.com/codingtrain
+// Code for: 
 
 // A class to describe a group of Particles
 // An ArrayList is used to manage the list of Particles 
 
-class ParticleSystem {
-  ArrayList<Particle> particles;
-  PVector origin;
+class Firework {
 
-  ParticleSystem(PVector position) {
-    origin = position.copy();
-    particles = new ArrayList<Particle>();
+  ArrayList<Particle> particles;    // An arraylist for all the particles
+  Particle firework;
+  float hu;
+  float xPos, yPos; 
+  Firework(float _xPos, float _yPos) {
+    hu = random(255);
+    xPos = _xPos;
+    yPos = _yPos; 
+    firework = new Particle(xPos, yPos, hu);
+    particles = new ArrayList<Particle>();   // Initialize the arraylist
   }
-
-  void addParticle() {
-    particles.add(new Particle(origin));
+  
+  boolean done() {
+    if (firework == null && particles.isEmpty()) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   void run() {
+    if (firework != null) {
+      fill(hu,255,255);
+      firework.applyForce(gravity);
+      firework.update();
+      firework.display();
+
+      if (firework.explode()) {
+        for (int i = 0; i < 40; i++) {
+          particles.add(new Particle(firework.location, hu));    // Add "num" amount of particles to the arraylist
+        }
+        firework = null;
+      }
+    }
+
     for (int i = particles.size()-1; i >= 0; i--) {
       Particle p = particles.get(i);
+      p.applyForce(gravity);
       p.run();
       if (p.isDead()) {
         particles.remove(i);
       }
     }
   }
-}
 
 
-// A simple Particle class
-
-class Particle {
-  PVector position;
-  PVector velocity;
-  PVector acceleration;
-  float lifespan;
-
-  Particle(PVector l) {
-    acceleration = new PVector(0, 0.05);
-    velocity = new PVector(random(-1, 1), random(-2, 0));
-    position = l.copy();
-    lifespan = 255.0;
-  }
-
-  void run() {
-    update();
-    display();
-  }
-
-  // Method to update position
-  void update() {
-    velocity.add(acceleration);
-    position.add(velocity);
-    lifespan -= 1.0;
-  }
-
-  // Method to display
-  void display() {
-    stroke(255, lifespan);
-    fill(255, lifespan);
-    ellipse(position.x, position.y, 8, 8);
-  }
-
-  // Is the particle still useful?
-  boolean isDead() {
-    if (lifespan < 0.0) {
+  // A method to test if the particle system still has particles
+  boolean dead() {
+    if (particles.isEmpty()) {
       return true;
     } else {
       return false;

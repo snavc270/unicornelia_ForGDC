@@ -19,13 +19,14 @@ import ddf.minim.ugens.*;
 Minim minim; 
 AudioPlayer introSong, gamePlay, shrink, pop; 
 int interval[] = new int[4]; 
-int state = 11; 
+int state = 0; 
 int pulse;
 PImage bgImage, feelingsDiagram;
 PImage horn, pannel, hand; 
 
 ArrayList <Window> windows[] = new ArrayList[4]; 
-//ArrayList <Window> windows = new ArrayList<Window>(); 
+ArrayList<Firework> fireworks;
+PVector gravity = new PVector(0, 0.2);
 
 int startTime; 
 int timer; 
@@ -55,7 +56,7 @@ void setup(){
   
   gamePlay = minim.loadFile("data/test.wav"); 
   gamePlay.loop(); 
-  gamePlay.rewind(); 
+  //gamePlay.rewind(); 
   
   shrink = minim.loadFile("data/shrink.mp3"); 
   pop = minim.loadFile("data/taskCompleted.mp3"); 
@@ -90,6 +91,8 @@ void setup(){
     n[i] = 0; 
   }
   
+  fireworks = new ArrayList<Firework>();
+  
   tutorialWindows[0] = new Window(random(width*.65, width*.75), random(height*.65, height*.75), 3);  
   tutorialWindows[1] = new Window (width*.8, height*.3, 1); 
   tutorialWindows[2] = new Window(width*.2, random(height*.65, height*.75), 2);  
@@ -102,6 +105,7 @@ void movieEvent(Movie m) {
 void draw(){
   float increment; 
   increment = sin(frameCount/3)*30;
+  
   if(state == 0){
      intro(); 
      if(keyPressed){
@@ -195,7 +199,8 @@ void draw(){
   
   //gamePlay 
   else if(state == 10){
-     introSong.pause(); 
+     introSong.pause();
+     introSong.rewind(); 
      gamePlay.play(); 
 
      timer = ((millis() - startTime)/1000)/60; 
@@ -210,15 +215,24 @@ void draw(){
      }
   }else if(state == 11){
     background(0); 
-    introSong.play(); 
+    introSong.play();  
     gamePlay.pause(); 
+    gamePlay.rewind(); 
+    
     text("its over", width/2, height/2);
     
     timer = ((millis() - startTime)/1000); 
-    if(timer>= 20){
+    if(timer>= 1){
       restart(); 
     }
     //barGraph(); 
+  }
+  
+  fireWorks(); 
+  for(int i = 0; i<n.length; i++){
+    if(n[i] >15){
+      n[i] = 0; 
+    } 
   }
 }
 
@@ -234,7 +248,7 @@ void intro(){
   image(introLoop, width*.5, height*.5, width, height); 
   introLoop.play(); 
   introSong.play(); 
-  
+  gamePlay.pause(); 
   pulse = int(sin(frameCount/4)*1.5); 
   textSize(52 + pulse); 
   text("insert horn to start", width*.37-pulse, height*.95); 
@@ -249,7 +263,6 @@ void restart(){
     n[i] = 0; 
   }
   range = .5; 
-  
 }
 
 float range = .5; //range for probability of good v bad 
@@ -285,6 +298,7 @@ void windowFunctions(float xPos, float yPos, int section){
       Window w = windows[section].get(i);
 
       if(w.windowSize<100){
+        fireworks.add(new Firework(w.xPos, w.yPos)); 
         windows[section].remove(i); 
       }
       if(windows[section].size()>0){
@@ -315,6 +329,16 @@ void windowFunctions(float xPos, float yPos, int section){
    }
 }
 
+void fireWorks(){
+  for (int i = fireworks.size()-1; i >= 0; i--) {
+    Firework f = fireworks.get(i);
+    f.run();
+    if (f.done()) {
+      fireworks.remove(i);
+    }
+  }
+  
+}
 int score [] = new int [4];
 void barGraph(){
   ///////map this to score 
