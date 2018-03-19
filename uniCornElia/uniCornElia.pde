@@ -17,9 +17,9 @@ import ddf.minim.spi.*;
 import ddf.minim.ugens.*;
 
 Minim minim; 
-AudioPlayer introSong; 
+AudioPlayer introSong, gamePlay, shrink, pop; 
 int interval[] = new int[4]; 
-int state = 4; 
+int state = 11; 
 int pulse;
 PImage bgImage, feelingsDiagram;
 PImage horn, pannel, hand; 
@@ -35,6 +35,9 @@ boolean button2Pressed = false;
 int tNum = 5; 
 Window [] tutorialWindows = new Window[6]; 
 
+//storyline indexer 
+int n [] = new int[8]; 
+
 void setup(){
   println(Serial.list()); 
   //size(800, 800); 
@@ -49,6 +52,13 @@ void setup(){
   minim = new Minim(this);
   introSong = minim.loadFile("data/introMusic.mp3");
   introSong.loop(); 
+  
+  gamePlay = minim.loadFile("data/test.wav"); 
+  gamePlay.loop(); 
+  gamePlay.rewind(); 
+  
+  shrink = minim.loadFile("data/shrink.mp3"); 
+  pop = minim.loadFile("data/taskCompleted.mp3"); 
   
   font = createFont("8-BitMadness.ttf", 60); 
   textFont(font); 
@@ -72,9 +82,14 @@ void setup(){
   startTime = millis(); 
   
   for(int i = 0; i<4; i++){
-    interval[i] = int(random(30,50)); 
+    interval[i] = int(random(5, 5+i*5)); 
     windows[i] = new ArrayList<Window>();
   }
+  
+  for(int i = 0; i<n.length; i++){
+    n[i] = 0; 
+  }
+  
   tutorialWindows[0] = new Window(random(width*.65, width*.75), random(height*.65, height*.75), 3);  
   tutorialWindows[1] = new Window (width*.8, height*.3, 1); 
   tutorialWindows[2] = new Window(width*.2, random(height*.65, height*.75), 2);  
@@ -83,17 +98,21 @@ void setup(){
 void movieEvent(Movie m) {
   m.read();
 }
+
 void draw(){
   float increment; 
   increment = sin(frameCount/3)*30;
   if(state == 0){
      intro(); 
-     for(int i = 0; i<4; i++){
-       if(windowButtons[i] == 0 || feelButtons[i] == 0){
-          state = 1; 
-          timerRestart(); 
-       }
+     if(keyPressed){
+       state = 1; 
      }
+     //for(int i = 0; i<4; i++){
+     //  if(windowButtons[i] == 0 || feelButtons[i] == 0){
+     //     state = 1; 
+     //     timerRestart(); 
+     //  }
+     //}
   }
   else if (state == 1){
      background(0); 
@@ -159,12 +178,12 @@ void draw(){
     image(hand, width*.32, height*.85 - increment); 
     tutorialWindows[3].display();
 ////////////////////////////////////////////////////////////////UNCOMMENT FOR TESTING//////////////////////////////////////////////     
-    if(feelButtons[3] == 1){
-      tutorialWindows[3].shrink();
-    }
-    //if(keyPressed){
+    //if(feelButtons[3] == 1){
     //  tutorialWindows[3].shrink();
     //}
+    if(keyPressed){
+      tutorialWindows[3].shrink();
+    }
     if(tutorialWindows[3].windowSize < 100){
       state = 9; 
     }
@@ -176,8 +195,10 @@ void draw(){
   
   //gamePlay 
   else if(state == 10){
+     introSong.pause(); 
+     gamePlay.play(); 
+
      timer = ((millis() - startTime)/1000)/60; 
-  
      image(bgImage, width*.5, height*.5, width, height); 
 
      windowFunctions(random(width*.15, width*.25),random(height*.15, height*.25), 0); 
@@ -189,8 +210,15 @@ void draw(){
      }
   }else if(state == 11){
     background(0); 
+    introSong.play(); 
+    gamePlay.pause(); 
     text("its over", width/2, height/2);
-    barGraph(); 
+    
+    timer = ((millis() - startTime)/1000); 
+    if(timer>= 20){
+      restart(); 
+    }
+    //barGraph(); 
   }
 }
 
@@ -205,7 +233,7 @@ void keyPressed(){
 void intro(){
   image(introLoop, width*.5, height*.5, width, height); 
   introLoop.play(); 
-  //introSong.play(); 
+  introSong.play(); 
   
   pulse = int(sin(frameCount/4)*1.5); 
   textSize(52 + pulse); 
@@ -214,12 +242,42 @@ void intro(){
 
 void restart(){
   state = 0; 
+  for(int i = 0; i<4; i++){
+    score[i] = 0; 
+  }
+  for(int i = 0; i<8; i++){
+    n[i] = 0; 
+  }
+  range = .5; 
+  
 }
 
+float range = .5; //range for probability of good v bad 
+int g[] = new int[4]; //good or bad boolean 
+void probGoodvBad(int section){
+  float r = random(0, 1); 
+  if(r < range){
+    g[section] = 0; //good task 
+  }else{
+    g[section] = 1; //bad task 
+  }
+  //println(g[section]); 
+}
+
+int range1 = 50; 
+int range2 = 60; 
 void windowFunctions(float xPos, float yPos, int section){
     if(state==10){
       if(frameCount % interval[section] == 0){
         windows[section].add(new Window(xPos, yPos, section)); 
+        probGoodvBad(section); 
+        if(range1>4 && range2>4){
+          range1 --; 
+          range2 --; 
+        }
+        for(int i = 0; i<4; i++){
+          interval[i] = int(random(range1, range2)); 
+        }
       }
     }
     
@@ -231,24 +289,36 @@ void windowFunctions(float xPos, float yPos, int section){
       }
       if(windows[section].size()>0){
         Window lastW = windows[section].get(windows[section].size()-1); 
-        if(feelButtons[section] == 0 || keyPressed){
+        
+        
+////////////////////////////////////////////////////////////////UNCOMMENT FOR TESTING//////////////////////////////////////////////   
+        //if(feelButtons[section] == 0){
+        //    lastW.shrink();
+        //}
+        //if(windowButtons[section] == 0){
+        //    lastW.pop(); 
+        //  //windows[section].remove(windows[section].size()-1); 
+        //}
+        
+        if(keyPressed){
           if(key == 'b'){
             lastW.shrink();
           }
         }
-        if(windowButtons[section] == 0 || keyPressed){
+        if(keyPressed){
           if(key == 'a'){
             lastW.pop(); 
-          }
-          //windows[section].remove(windows[section].size()-1); 
+          } 
         }
       }
       w.display();
    }
 }
 
+int score [] = new int [4];
 void barGraph(){
   ///////map this to score 
+  score[0] = n[0] - n[1]; 
   for(int i = 0; i<4; i++){
     rect(100+i*200, 100, 100, 300); 
   }
