@@ -19,10 +19,11 @@ import ddf.minim.ugens.*;
 Minim minim; 
 AudioPlayer introSong, gamePlay, shrink, pop; 
 int interval[] = new int[4]; 
-int state = 0; 
+int state = 10; 
 int pulse;
 PImage bgImage, feelingsDiagram;
 PImage horn, pannel, hand; 
+PImage lifeAnalysis; 
 
 ArrayList <Window> windows[] = new ArrayList[4]; 
 ArrayList<Firework> fireworks;
@@ -77,6 +78,9 @@ void setup(){
   
   hand = loadImage("hand.png"); 
   hand.resize(0, int(height*.15));
+  
+  lifeAnalysis = loadImage("lifeReport.png");
+  lifeAnalysis.resize(0, int(height*.85)); 
   
   feelingsDiagram.resize(0, int(height*.45));
   
@@ -210,8 +214,9 @@ void draw(){
      windowFunctions(random(width*.65, width*.75), random(height*.15, height*.25), 1); 
      windowFunctions(random(width*.15, width*.25), random(height*.65, height*.75), 2);
      windowFunctions(random(width*.65, width*.75), random(height*.65, height*.75), 3); 
-     if(timer>=2){
+     if(timer>=1){
        state = 11; 
+       startTime = millis(); 
      }
   }else if(state == 11){
     background(0); 
@@ -222,14 +227,15 @@ void draw(){
     text("its over", width/2, height/2);
     
     timer = ((millis() - startTime)/1000); 
-    if(timer>= 1){
+    if(timer>= 60){
       restart(); 
     }
-    //barGraph(); 
+    barGraph(); 
   }
   
   fireWorks(); 
   for(int i = 0; i<n.length; i++){
+    println(n[i]); 
     if(n[i] >15){
       n[i] = 0; 
     } 
@@ -268,7 +274,10 @@ void restart(){
 float range = .5; //range for probability of good v bad 
 int g[] = new int[4]; //good or bad boolean 
 void probGoodvBad(int section){
+  range = range- range%0.01; 
+  
   float r = random(0, 1); 
+  //println(range); 
   if(r < range){
     g[section] = 0; //good task 
   }else{
@@ -340,11 +349,19 @@ void fireWorks(){
   
 }
 int score [] = new int [4];
+float heights[] = new float[4]; 
+color barColors[] = {color(236, 0, 140), color(0, 191,243), color(175, 68, 255), color(0, 255, 0)}; 
 void barGraph(){
-  ///////map this to score 
-  score[0] = n[0] - n[1]; 
+  ///////map this to score  
+  image(bgImage, width*.5, height*.5, width, height);  
+  fill(255); 
+  
+  image(lifeAnalysis, width*.5, height*.5); 
+  
   for(int i = 0; i<4; i++){
-    rect(100+i*200, 100, 100, 300); 
+    heights[i] = map(score[i], 0, 15, 0, 300); 
+    fill(barColors[i]); 
+    rect(width*.35+i*120, height*.62 - heights[i], 65, heights[i]); 
   }
 }
 

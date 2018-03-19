@@ -27,19 +27,19 @@ class Window{
     textAlign(CENTER); 
     text(textArray[windowNum*2+g[windowNum]][n[windowNum*2+g[windowNum]]], xPos-250, yPos, 500, yPos); 
     windows[windowNum].resize(0, windowSize); 
-    
-
   }
   
   void pop(){
     pop.play(); 
     pop.rewind(); 
     windowSize = 50; 
-    if(g[windowNum] == 0){
+    if(g[windowNum] == 0 && range<.9){
       range += .1; 
       n[windowNum*2+g[windowNum]] ++; 
-    }else if (g[windowNum] == 1){
+      score[windowNum] ++; 
+    }else if (g[windowNum] == 1 && range>= .2){
       range -= .1; 
+      score[windowNum] --; 
       n[windowNum*2+g[windowNum]] ++; 
     }
   }
@@ -50,14 +50,16 @@ class Window{
     if(windowSize>= 50){
       windowSize -= 50;
     } 
-    if(windowSize == 100){
-      if(g[windowNum] == 0 && range>= .1){
+    if(windowSize <= 100){
+      if(g[windowNum] == 0 && range>= .2){
         range -= .1; 
+        score[windowNum] --; 
         n[windowNum*2+g[windowNum]] ++; 
       }
       
-      if(g[windowNum] == 1 && range < 1){
+      if(g[windowNum] == 1 && range < .9){
         range += .1; 
+        score[windowNum] ++; 
         n[windowNum*2+g[windowNum]] ++; 
       }
     }
