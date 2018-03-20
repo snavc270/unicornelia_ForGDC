@@ -22,10 +22,21 @@ void timerRestart(){
   stateStartTime = millis()/1000; 
 }
 
-void timeChange(int timer, int xPos, int yPos, int n){
+void timeChange(int timer, int xPos, int yPos, int n){ 
     stateTime = millis()/1000 - stateStartTime; 
     displayTutorialText(xPos, yPos, n);
-    if(stateTime > timer){
+    if(stateTime == timer){
+
+    }
+    if(stateTime >= timer){
+       if(state == 9){
+       if ( gamePlay.isPlaying() ){
+          gamePlay.pause();
+        }
+        else{
+          gamePlay.loop();
+        }
+      }
       state ++; 
       stateStartTime = millis()/1000;
       startTime = millis(); 

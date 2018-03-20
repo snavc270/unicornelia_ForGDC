@@ -19,7 +19,7 @@ import ddf.minim.ugens.*;
 Minim minim; 
 AudioPlayer introSong, gamePlay, shrink, pop; 
 int interval[] = new int[4]; 
-int state = 10; 
+int state = 0; 
 int pulse;
 PImage bgImage, feelingsDiagram;
 PImage horn, pannel, hand; 
@@ -112,19 +112,21 @@ void draw(){
   
   if(state == 0){
      intro(); 
-     if(keyPressed){
-       state = 1; 
-     }
-     //for(int i = 0; i<4; i++){
-     //  if(windowButtons[i] == 0 || feelButtons[i] == 0){
-     //     state = 1; 
-     //     timerRestart(); 
-     //  }
+     //if(keyPressed){
+     //  state = 1; 
+     //  timerRestart(); 
      //}
+     for(int i = 0; i<4; i++){
+       if(windowButtons[i] == 0 || feelButtons[i] == 0){
+          state = 1; 
+          timerRestart(); 
+       }
+     }
   }
   else if (state == 1){
+     introLoop.stop(); 
      background(0); 
-     timeChange(2, int(width*.2), int(height*.4), 0); 
+     timeChange(3, int(width*.2), int(height*.4), 0); 
   }
   else if (state == 2){
      timeChange(3, int(width*.2), int(height*.4), 1); 
@@ -140,40 +142,42 @@ void draw(){
     image(horn, width*.32 + increment, height*.56 - increment); 
    
      ////////////////////////////////////////////////////////////////UNCOMMENT FOR TESTING//////////////////////////////////////////////   
-    //if(windowButtons[3] ==0){
-    //  state = 5; 
-    //}
-    if(keyPressed){
+    if(windowButtons[3] ==0){
       state = 5; 
     }
+    //if(keyPressed){
+    //  timerRestart();
+    //  state = 5; 
+    //}
   }
   else if (state == 5){
     displayTutorialText(int(width*.05),int(height*.1), 4);
-    if(keyPressed){
-      state = 6; 
-    }
-     ////////////////////////////////////////////////////////////////UNCOMMENT FOR TESTING//////////////////////////////////////////////   
-    //if(windowButtons[1] ==0){
-    //  button1Pressed = true; 
-    //}
-    //if(!button1Pressed){
-    //  tutorialWindows[1].display();
-    //}
-    //if(windowButtons[2] == 0){
-    //  button2Pressed = true; 
-    //}
-    //if(!button2Pressed){
-    //  tutorialWindows[2].display();
-    //}
-    
-    //if(button1Pressed && button2Pressed){
+    //if(keyPressed){
+    //  timerRestart();
     //  state = 6; 
     //}
+     ////////////////////////////////////////////////////////////////UNCOMMENT FOR TESTING//////////////////////////////////////////////   
+    if(windowButtons[1] ==0){
+      button1Pressed = true; 
+    }
+    if(!button1Pressed){
+      tutorialWindows[1].display();
+    }
+    if(windowButtons[2] == 0){
+      button2Pressed = true; 
+    }
+    if(!button2Pressed){
+      tutorialWindows[2].display();
+    }
+    
+    if(button1Pressed && button2Pressed){
+      state = 6; 
+    }
   }
   else if (state == 6){
     button1Pressed = false; 
     button2Pressed = false; 
-    timeChange(10, int(width*.05), int(height*.1), 5); 
+    timeChange(4, int(width*.05), int(height*.1), 5); 
   }
   else if (state == 7){
     timeChange(3, int(width*.05), int(height*.1), 6); 
@@ -186,14 +190,15 @@ void draw(){
     image(hand, width*.32, height*.85 - increment); 
     tutorialWindows[3].display();
 ////////////////////////////////////////////////////////////////UNCOMMENT FOR TESTING//////////////////////////////////////////////     
-    //if(feelButtons[3] == 1){
-    //  tutorialWindows[3].shrink();
-    //}
-    if(keyPressed){
+    if(feelButtons[3] == 1){
       tutorialWindows[3].shrink();
     }
+    //if(keyPressed){
+    //  tutorialWindows[3].shrink();
+    //}
     if(tutorialWindows[3].windowSize < 100){
       state = 9; 
+      timerRestart(); 
     }
   }
   else if (state == 9){
@@ -203,9 +208,7 @@ void draw(){
   
   //gamePlay 
   else if(state == 10){
-     introSong.pause();
-     introSong.rewind(); 
-     gamePlay.play(); 
+     introSong.pause(); 
 
      timer = ((millis() - startTime)/1000)/60; 
      image(bgImage, width*.5, height*.5, width, height); 
@@ -216,18 +219,20 @@ void draw(){
      windowFunctions(random(width*.65, width*.75), random(height*.65, height*.75), 3); 
      if(timer>=1){
        state = 11; 
-       startTime = millis(); 
+       startTime = millis();
+       gamePlay.pause(); 
+     if ( introSong.isPlaying() ){
+        introSong.pause();
+      }else{
+        introSong.loop();
+      }
      }
   }else if(state == 11){
     background(0); 
-    introSong.play();  
-    gamePlay.pause(); 
-    gamePlay.rewind(); 
-    
     text("its over", width/2, height/2);
     
     timer = ((millis() - startTime)/1000); 
-    if(timer>= 60){
+    if(timer>= 10){
       restart(); 
     }
     barGraph(); 
@@ -253,9 +258,9 @@ void keyPressed(){
 void intro(){
   image(introLoop, width*.5, height*.5, width, height); 
   introLoop.play(); 
-  introSong.play(); 
   gamePlay.pause(); 
   pulse = int(sin(frameCount/4)*1.5); 
+  fill(255); 
   textSize(52 + pulse); 
   text("insert horn to start", width*.37-pulse, height*.95); 
 }
@@ -315,24 +320,23 @@ void windowFunctions(float xPos, float yPos, int section){
         
         
 ////////////////////////////////////////////////////////////////UNCOMMENT FOR TESTING//////////////////////////////////////////////   
-        //if(feelButtons[section] == 0){
-        //    lastW.shrink();
-        //}
-        //if(windowButtons[section] == 0){
-        //    lastW.pop(); 
-        //  //windows[section].remove(windows[section].size()-1); 
-        //}
-        
-        if(keyPressed){
-          if(key == 'b'){
+        if(feelButtons[section] == 0){
             lastW.shrink();
-          }
         }
-        if(keyPressed){
-          if(key == 'a'){
+        if(windowButtons[section] == 0){
             lastW.pop(); 
-          } 
+          //windows[section].remove(windows[section].size()-1); 
         }
+        //if(keyPressed){
+        //  if(key == 'b'){
+        //    lastW.shrink();
+        //  }
+        //}
+        //if(keyPressed){
+        //  if(key == 'a'){
+        //    lastW.pop(); 
+        //  } 
+        //}
       }
       w.display();
    }
@@ -381,6 +385,5 @@ void serialEvent(Serial port) {
         lastWindowButtons[i] = windowButtons[i]; 
       }
     }
-   
   }
 }
