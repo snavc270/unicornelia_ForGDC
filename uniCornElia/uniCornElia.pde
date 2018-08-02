@@ -38,7 +38,8 @@ int tNum = 5;
 Window [] tutorialWindows = new Window[6]; 
 
 //storyline indexer 
-int n [] = new int[8]; 
+int n; 
+//int n [] = new int[8]; 
 
 void setup() {
   println(Serial.list()); 
@@ -91,9 +92,9 @@ void setup() {
     windows[i] = new ArrayList<Window>();
   }
 
-  for (int i = 0; i<n.length; i++) {
-    n[i] = 0;
-  }
+  //for (int i = 0; i<n.length; i++) {
+  //  n[i] = 0;
+  //}
 
   fireworks = new ArrayList<Firework>();
 
@@ -230,12 +231,12 @@ void draw() {
   }
 
   fireWorks(); 
-  for (int i = 0; i<n.length; i++) {
-    println(n[i]); 
-    if (n[i] >15) {
-      n[i] = 0;
-    }
-  }
+  //for (int i = 0; i<n.length; i++) {
+  //  println(n[i]); 
+  //  if (n[i] >15) {
+  //    n[i] = 0;
+  //  }
+  //}
 }
 
 void keyPressed() {
@@ -261,8 +262,12 @@ void restart() {
   for (int i = 0; i<4; i++) {
     score[i] = 0;
   }
-  for (int i = 0; i<8; i++) {
-    n[i] = 0;
+
+  //remove all items from an array list 
+  for( int i = 0; i< 4; i++){
+    for(int j = 0; j<windows[i].size(); j++){
+      windows[i].remove(j); 
+    }
   }
   range = .5;
 }

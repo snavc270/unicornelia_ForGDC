@@ -1,7 +1,7 @@
 String tText [] = {"YOU ARE UNICORNELIA.", "Completing tasks is essential to maintaining your sparkle.",
 "Tasks are sorted into four areas of your life.", "Insert your horn into the corresponding color hole to complete a task.", 
-"Keep up with your tasks!", "Think twice about some tasks before completing.", "Trust your gut!", 
-"To ignore a task, maintain your corresponding feelings!", "KEEP EVERYTHING FROM FALLING APART!"}; 
+"Keep up with your tasks!", "Think twice about some tasks before completing.", "Trust your gut! Use your inner feelies", 
+"To ignore a task, look inside yourself and tap your corresponding feelies button!", "KEEP EVERYTHING FROM FALLING APART!"}; 
  
 void displayTutorialText(int xPos, int yPos, int n){
   if(state>= 2 && state<9){

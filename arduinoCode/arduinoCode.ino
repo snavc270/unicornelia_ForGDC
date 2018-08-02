@@ -1,7 +1,7 @@
 int buttons[8];  
 int lastButtonState[8];
 boolean buttonClicked[8]; 
-int pins[] = {13, 12, 11, 10, 8, 9, 7, 6}; 
+int pins[] = {13, 12, 11, 10, 8, 6, 9, 7}; 
 
 void setup() {
   // put your setup code here, to run once:
@@ -27,7 +27,7 @@ void loop() {
       buttonClicked[i] = true; 
     }
     lastButtonState[i] = buttons[i]; 
-    delay(10); 
+
   }
     Serial.println(); 
 

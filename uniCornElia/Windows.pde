@@ -14,7 +14,7 @@ class Window{
       windows[i].resize(0, windowSize); 
     }
 
-    //n = floor(random(0,5)); 
+    n = floor(random(0,5)); 
     //text size
     s = 32; 
     //probGoodvBad(); 
@@ -25,7 +25,7 @@ class Window{
     textSize(s); 
     fill(255); 
     textAlign(CENTER); 
-    text(textArray[windowNum*2+g[windowNum]][n[windowNum*2+g[windowNum]]], xPos-250, yPos, 500, yPos); 
+    text(textArray[windowNum*2+g[windowNum]][n], xPos-250, yPos, 500, yPos); 
     windows[windowNum].resize(0, windowSize); 
   }
   
@@ -35,12 +35,12 @@ class Window{
     windowSize = 50; 
     if(g[windowNum] == 0 && range<.9){
       range += .1; 
-      n[windowNum*2+g[windowNum]] ++; 
+      //n[windowNum*2+g[windowNum]] ++; 
       score[windowNum] ++; 
     }else if (g[windowNum] == 1 && range>= .2){
       range -= .1; 
       score[windowNum] --; 
-      n[windowNum*2+g[windowNum]] ++; 
+      //n[windowNum*2+g[windowNum]] ++; 
     }
   }
   void shrink(){
@@ -54,13 +54,13 @@ class Window{
       if(g[windowNum] == 0 && range>= .2){
         range -= .1; 
         score[windowNum] --; 
-        n[windowNum*2+g[windowNum]] ++; 
+        //n[windowNum*2+g[windowNum]] ++; 
       }
       
       if(g[windowNum] == 1 && range < .9){
         range += .1; 
         score[windowNum] ++; 
-        n[windowNum*2+g[windowNum]] ++; 
+        //n[windowNum*2+g[windowNum]] ++; 
       }
     }
   }
