@@ -4,7 +4,7 @@ class Window{
   int windowNum; 
   int s; //text size  
   PImage windows[] = new PImage[4]; 
-  
+  int n; 
   Window(float _xPos, float _yPos, int _windowNum){
     xPos = _xPos; 
     yPos = _yPos; 
@@ -14,7 +14,7 @@ class Window{
       windows[i].resize(0, windowSize); 
     }
 
-    n = floor(random(0,5)); 
+    n = floor(random(0,14)); 
     //text size
     s = 32; 
     //probGoodvBad(); 
@@ -25,7 +25,7 @@ class Window{
     textSize(s); 
     fill(255); 
     textAlign(CENTER); 
-    text(textArray[windowNum*2+g[windowNum]][n], xPos-250, yPos, 500, yPos); 
+    text(textArray[windowNum*2+g[windowNum]][n], xPos-190, yPos, 380, yPos); 
     windows[windowNum].resize(0, windowSize); 
   }
   

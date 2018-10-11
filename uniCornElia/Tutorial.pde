@@ -9,7 +9,7 @@ void displayTutorialText(int xPos, int yPos, int n){
   }
   noStroke(); 
   fill(0); 
-  rect(xPos, yPos-25, width*.6, 150); 
+  rect(xPos, yPos-25, width*.6, 170); 
   fill(255); 
   textSize(52); 
   textAlign(CENTER);

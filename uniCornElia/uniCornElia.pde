@@ -1,3 +1,4 @@
+
 import processing.serial.*;
 import processing.video.*;
 
@@ -19,7 +20,7 @@ import ddf.minim.ugens.*;
 Minim minim; 
 AudioPlayer introSong, gamePlay, shrink, pop; 
 int interval[] = new int[4]; 
-int state = 11; 
+int state = 0; 
 int pulse;
 PImage bgImage, feelingsDiagram;
 PImage horn, pannel, hand; 
@@ -38,13 +39,13 @@ int tNum = 5;
 Window [] tutorialWindows = new Window[6]; 
 
 //storyline indexer 
-int n; 
+
 //int n [] = new int[8]; 
 
 void setup() {
   println(Serial.list()); 
   //size(800, 800); 
-  fullScreen(); 
+  fullScreen(2); 
   imageMode(CENTER); 
   introLoop = new Movie(this, "/Users/courtney/Desktop/uniCornElia_allCode/uniCornElia/data/introFinal.mp4"); 
   introLoop.play(); 
@@ -66,7 +67,7 @@ void setup() {
   font = createFont("8-BitMadness.ttf", 60); 
   textFont(font); 
 
-  port = new Serial(this, Serial.list()[1], 9600); 
+  port = new Serial(this, Serial.list()[2], 9600); 
   port.bufferUntil('\n');
 
   bgImage = loadImage("bgImage.png"); 
@@ -88,7 +89,7 @@ void setup() {
   startTime = millis(); 
 
   for (int i = 0; i<4; i++) {
-    interval[i] = int(random(5, 5+i*5)); 
+    interval[i] = int(random(3, 5+i*5)); 
     windows[i] = new ArrayList<Window>();
   }
 
@@ -98,10 +99,10 @@ void setup() {
 
   fireworks = new ArrayList<Firework>();
 
-  tutorialWindows[0] = new Window(random(width*.65, width*.75), random(height*.65, height*.75), 3);  
+  tutorialWindows[0] = new Window (width*.65, height*.8, 3);  
   tutorialWindows[1] = new Window (width*.8, height*.3, 1); 
   tutorialWindows[2] = new Window(width*.2, random(height*.65, height*.75), 2);  
-  tutorialWindows[3] = new Window(random(width*.65, width*.75), random(height*.65, height*.75), 3);
+  tutorialWindows[3] = new Window (width*.8, height*.3, 1); 
 }
 void movieEvent(Movie m) {
   m.read();
@@ -109,7 +110,7 @@ void movieEvent(Movie m) {
 
 void draw() {
   float increment; 
-  increment = sin(frameCount/3)*30;
+  increment = sin(frameCount/4)*30;
 
   if (state == 0) {
     intro(); 
@@ -117,7 +118,7 @@ void draw() {
     //  state = 1; 
     //  timerRestart(); 
     //}
-    for (int i = 0; i<4; i++) {
+    for (int i = 0; i<3; i++) {
       if (windowButtons[i] == 0 || feelButtons[i] == 0) {
         state = 1; 
         timerRestart();
@@ -183,7 +184,7 @@ void draw() {
     image(hand, width*.32, height*.85 - increment); 
     tutorialWindows[3].display();
     ////////////////////////////////////////////////////////////////UNCOMMENT FOR TESTING//////////////////////////////////////////////     
-    if (feelButtons[3] == 1) {
+    if (feelButtons[1] == 0) {
       tutorialWindows[3].shrink();
     }
     //if(keyPressed){
@@ -194,6 +195,7 @@ void draw() {
       timerRestart();
     }
   } else if (state == 9) {
+    tutorialWindows[3].windowSize = int(height*.6); 
     background(0); 
     timeChange(5, int(width*.22), int(height*.45), 8);
   }
@@ -202,14 +204,19 @@ void draw() {
   else if (state == 10) {
     introSong.pause(); 
 
-    timer = ((millis() - startTime)/1000)/60; 
+    timer = ((millis() - startTime)/1000); 
     image(bgImage, width*.5, height*.5, width, height); 
 
     windowFunctions(random(width*.15, width*.25), random(height*.15, height*.25), 0); 
     windowFunctions(random(width*.65, width*.75), random(height*.15, height*.25), 1); 
     windowFunctions(random(width*.15, width*.25), random(height*.65, height*.75), 2);
     windowFunctions(random(width*.65, width*.75), random(height*.65, height*.75), 3); 
-    if (timer>=1) {
+    
+    if(timer%10==0){
+      numWindows ++; 
+    }
+    
+    if (timer>=60) {
       state = 11; 
       startTime = millis();
       gamePlay.pause(); 
@@ -231,12 +238,6 @@ void draw() {
   }
 
   fireWorks(); 
-  //for (int i = 0; i<n.length; i++) {
-  //  println(n[i]); 
-  //  if (n[i] >15) {
-  //    n[i] = 0;
-  //  }
-  //}
 }
 
 void keyPressed() {
@@ -254,6 +255,7 @@ void intro() {
   pulse = int(sin(frameCount/4)*1.5); 
   fill(255); 
   textSize(52 + pulse); 
+  textAlign(LEFT);
   text("insert horn to start", width*.37-pulse, height*.95);
 }
 
@@ -269,7 +271,11 @@ void restart() {
       windows[i].remove(j); 
     }
   }
+  range1 = 300; 
+  range2 = 350; 
   range = .5;
+  button1Pressed = false; 
+  button2Pressed = false; 
 }
 
 float range = .5; //range for probability of good v bad 
@@ -287,21 +293,29 @@ void probGoodvBad(int section) {
   //println(g[section]);
 }
 
-int range1 = 50; 
-int range2 = 60; 
+int range1 = 300; 
+int range2 = 350; 
+int numWindows = 1; 
 void windowFunctions(float xPos, float yPos, int section) {
   if (state==10) {
-    if (frameCount % interval[section] == 0) {
+    //get length of array 
+    //if length of array is less than certain number, then add a new window 
+    
+    if(windows[section].size()< numWindows){
       windows[section].add(new Window(xPos, yPos, section)); 
       probGoodvBad(section); 
-      if (range1>15 && range2>20) {
-        range1 --; 
-        range2 --;
-      }
-      for (int i = 0; i<4; i++) {
-        interval[i] = int(random(range1, range2));
-      }
     }
+    //if (frameCount % interval[section] == 0) {
+    //  windows[section].add(new Window(xPos, yPos, section)); 
+    //  probGoodvBad(section); 
+    //  if (range1>30 && range2>45) {
+    //    range1 -=5; 
+    //    range2 -=5;
+    //  }
+    //  for (int i = 0; i<4; i++) {
+    //    interval[i] = int(random(range1, range2));
+    //  }
+    //}
   }
 
   for (int i = 0; i < windows[section].size(); i++) {
@@ -362,13 +376,13 @@ void barGraph() {
     fill(barColors[i]); 
     rect(width*.35+i*120, height*.62 - heights[i], 65, heights[i]);
     textSize(24); 
-    text(textLabels[i], width*.35+i*120, height*.62 - heights[i] + 25, 100, 50); 
+    text(textLabels[i], width*.337+i*120, height*.62 - heights[i] + 25, 100, 50); 
   }
   
   fill(0); 
   textSize(42); 
  
-  text("YOU STILL HAVE SOME WORK TO DO ON YOURSELF BUT YOU'RE GETTING THERE! NEVER LOSE YOUR SPARKLE!", width*.25, height*.73, 700, 200); 
+  text("YOU STILL HAVE SOME WORK TO DO ON YOURSELF BUT YOU'RE GETTING THERE! NEVER LOSE YOUR SPARKLE!", (width/2)-300, height*.73, 600, 200); 
 }
 
 void serialEvent(Serial port) {
